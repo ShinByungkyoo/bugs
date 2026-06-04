@@ -38,10 +38,6 @@ export default function CameraScanner({ onImageCaptured }) {
 
       const mediaStream = await navigator.mediaDevices.getUserMedia(constraints);
       setStream(mediaStream);
-      if (videoRef.current) {
-        videoRef.current.srcObject = mediaStream;
-        videoRef.current.play().catch(e => console.error("비디오 재생 오류:", e));
-      }
       setIsCameraActive(true);
     } catch (err) {
       console.error("카메라 연결 실패:", err);
@@ -60,6 +56,14 @@ export default function CameraScanner({ onImageCaptured }) {
       startCamera(nextMode);
     }
   };
+
+  // Bind stream to video element when it mounts
+  useEffect(() => {
+    if (isCameraActive && stream && videoRef.current) {
+      videoRef.current.srcObject = stream;
+      videoRef.current.play().catch(e => console.error("비디오 재생 오류:", e));
+    }
+  }, [stream, isCameraActive]);
 
   // Trigger when scanner mounts / starts
   useEffect(() => {

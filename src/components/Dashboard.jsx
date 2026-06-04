@@ -47,7 +47,7 @@ export default function Dashboard({ setActiveTab, onStartDemoScan }) {
     <div style={{ animation: "fadeIn 0.4s ease-out" }}>
       {/* Welcome Banner */}
       <div className="welcome-banner">
-        <h2>안심하는 친환경 공간,<br />EcoPest와 함께 만드세요</h2>
+        <h2>안심하는 친환경 공간,<br />Wecheck과 함께 만드세요</h2>
         <p>집안이나 야외에서 만난 해충, 당황하지 말고 사진을 찍어보세요. 인공지능이 정확히 식별하고 조치법을 안내해 드립니다.</p>
       </div>
 
@@ -124,7 +124,7 @@ export default function Dashboard({ setActiveTab, onStartDemoScan }) {
         <div>
           <h4 style={{ fontSize: "14px", fontWeight: "700", marginBottom: "4px" }}>화학 약품은 최소한으로!</h4>
           <p style={{ fontSize: "12.5px", color: "var(--color-text-muted)", lineHeight: 1.5 }}>
-            에코페스트는 가급적 유독성 화학 살충제의 남용을 줄이고 물리적인 트랩 설치 및 환경 정비를 통한 자연 친화적 해충 근절 방식을 지향합니다.
+            Wecheck은 가급적 유독성 화학 살충제의 남용을 줄이고 물리적인 트랩 설치 및 환경 정비를 통한 자연 친화적 해충 근절 방식을 지향합니다.
           </p>
         </div>
       </div>

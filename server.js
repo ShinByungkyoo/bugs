@@ -151,7 +151,7 @@ app.get(/.*/, (req, res) => {
 
 app.listen(PORT, () => {
   console.log(`==================================================`);
-  console.log(`🟢 EcoPest Backend Server running on port ${PORT}`);
+  console.log(`🟢 Wecheck Backend Server running on port ${PORT}`);
   console.log(`   Local API Endpoint: http://localhost:${PORT}/api/identify`);
   console.log(`==================================================`);
 });
