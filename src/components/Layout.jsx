@@ -21,9 +21,12 @@ export default function Layout({
     <>
       {/* Header */}
       <header className="app-header">
-        <div className="app-logo" onClick={() => setActiveTab("dashboard")} style={{ cursor: "pointer" }}>
-          <Leaf size={22} fill="var(--color-primary)" strokeWidth={1.5} />
-          <span>EcoPest</span>
+        <div className="app-logo" onClick={() => setActiveTab("dashboard")} style={{ cursor: "pointer", display: "flex", alignItems: "center" }}>
+          <img 
+            src="/cesco_wecheck.png" 
+            alt="CESCO WeCheck Logo" 
+            style={{ height: "32px", width: "auto", borderRadius: "6px" }} 
+          />
         </div>
         
         <div className="app-header-actions">
