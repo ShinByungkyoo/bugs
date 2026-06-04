@@ -1,0 +1,262 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>EcoPest 백엔드 API 테스트 유틸리티</title>
+  <style>
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+      background-color: #f4f6f8;
+      color: #333;
+      padding: 40px 20px;
+      max-width: 800px;
+      margin: 0 auto;
+    }
+    .container {
+      background: white;
+      padding: 30px;
+      border-radius: 12px;
+      box-shadow: 0 4px 20px rgba(0,0,0,0.08);
+    }
+    h1 {
+      font-size: 24px;
+      margin-top: 0;
+      color: #4E6E58;
+      border-bottom: 2px solid #E3E9E5;
+      padding-bottom: 12px;
+    }
+    p.desc {
+      color: #666;
+      font-size: 14px;
+      line-height: 1.5;
+      margin-bottom: 24px;
+    }
+    .form-group {
+      margin-bottom: 20px;
+    }
+    label {
+      display: block;
+      font-weight: 600;
+      margin-bottom: 8px;
+      font-size: 14px;
+    }
+    input[type="text"], input[type="file"] {
+      width: 100%;
+      padding: 10px;
+      border: 1px solid #ccc;
+      border-radius: 6px;
+      box-sizing: border-box;
+    }
+    .preview-container {
+      margin-top: 15px;
+      max-height: 300px;
+      overflow: hidden;
+      border-radius: 8px;
+      border: 1px dashed #ccc;
+      display: none;
+      align-items: center;
+      justify-content: center;
+      background-color: #fafafa;
+    }
+    .preview-container img {
+      max-width: 100%;
+      max-height: 300px;
+      object-fit: contain;
+    }
+    button {
+      background-color: #4E6E58;
+      color: white;
+      border: none;
+      padding: 12px 20px;
+      font-size: 16px;
+      font-weight: bold;
+      border-radius: 6px;
+      cursor: pointer;
+      width: 100%;
+      transition: background-color 0.2s;
+    }
+    button:hover {
+      background-color: #3A5241;
+    }
+    button:disabled {
+      background-color: #ccc;
+      cursor: not-allowed;
+    }
+    .result-section {
+      margin-top: 30px;
+      display: none;
+    }
+    .result-title {
+      font-weight: bold;
+      margin-bottom: 10px;
+      font-size: 16px;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+    pre {
+      background-color: #272822;
+      color: #f8f8f2;
+      padding: 15px;
+      border-radius: 8px;
+      overflow-x: auto;
+      font-size: 13px;
+      line-height: 1.5;
+    }
+    .status-badge {
+      display: inline-block;
+      padding: 4px 8px;
+      border-radius: 4px;
+      font-size: 12px;
+      font-weight: bold;
+    }
+    .status-success {
+      background-color: #e6f4ea;
+      color: #137333;
+    }
+    .status-error {
+      background-color: #fce8e6;
+      color: #c5221f;
+    }
+    .loader {
+      display: none;
+      text-align: center;
+      margin: 20px 0;
+      font-weight: bold;
+      color: #4E6E58;
+    }
+  </style>
+</head>
+<body>
+
+<div class="container">
+  <h1>EcoPest 백엔드 API 테스트 도구</h1>
+  <p class="desc">
+    이 도구는 React 화면과 무관하게 백엔드 프록시 서버(<code>http://localhost:3001/api/identify</code>)가 정상적으로 동작하는지, 
+    그리고 설정된 Gemini API 키가 유효한지 직접 호출해 검증하는 개발자용 테스트 웹 페이지입니다.<br>
+    <strong>주의:</strong> 백엔드 서버(<code>node server.js</code>)가 3001 포트에서 실행 중이어야 테스트가 가능합니다.
+  </p>
+
+  <div class="form-group">
+    <label for="imageInput">1. 분석할 해충 사진 선택</label>
+    <input type="file" id="imageInput" accept="image/*">
+    <div id="previewContainer" class="preview-container">
+      <img id="imagePreview" src="" alt="미리보기">
+    </div>
+  </div>
+
+  <div class="form-group">
+    <label for="userKeyInput">2. 사용자 정의 API Key (선택 - 비워둘 경우 서버의 .env 키 사용)</label>
+    <input type="text" id="userKeyInput" placeholder="AI Studio에서 발급받은 Gemini API 키 입력...">
+  </div>
+
+  <button id="submitBtn" disabled>해충 분석 요청 (POST /api/identify)</button>
+
+  <div id="loader" class="loader">
+    🔄 백엔드 프록시 서버를 통해 Gemini AI 분석 진행 중... (약 2~4초 소요)
+  </div>
+
+  <div id="resultSection" class="result-section">
+    <div class="result-title">
+      <span>분석 응답 결과:</span>
+      <span id="statusBadge" class="status-badge"></span>
+    </div>
+    <pre id="jsonOutput"></pre>
+  </div>
+</div>
+
+<script>
+  const imageInput = document.getElementById('imageInput');
+  const imagePreview = document.getElementById('imagePreview');
+  const previewContainer = document.getElementById('previewContainer');
+  const userKeyInput = document.getElementById('userKeyInput');
+  const submitBtn = document.getElementById('submitBtn');
+  const loader = document.getElementById('loader');
+  const resultSection = document.getElementById('resultSection');
+  const statusBadge = document.getElementById('statusBadge');
+  const jsonOutput = document.getElementById('jsonOutput');
+
+  let base64Image = null;
+
+  // Handle image select
+  imageInput.addEventListener('change', function(e) {
+    const file = e.target.files[0];
+    if (!file) {
+      base64Image = null;
+      submitBtn.disabled = true;
+      previewContainer.style.display = 'none';
+      return;
+    }
+
+    const reader = new FileReader();
+    reader.onload = function(event) {
+      base64Image = event.target.result;
+      imagePreview.src = base64Image;
+      previewContainer.style.display = 'flex';
+      submitBtn.disabled = false;
+    };
+    reader.readAsDataURL(file);
+  });
+
+  // Handle submit click
+  submitBtn.addEventListener('click', async function() {
+    if (!base64Image) return;
+
+    // Show loading
+    loader.style.display = 'block';
+    resultSection.style.display = 'none';
+    submitBtn.disabled = true;
+
+    try {
+      const payload = {
+        image: base64Image
+      };
+      
+      const customKey = userKeyInput.value.trim();
+      if (customKey) {
+        payload.userApiKey = customKey;
+      }
+
+      // Hit local express proxy server
+      const response = await fetch('http://localhost:3001/api/identify', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json'
+        },
+        body: JSON.stringify(payload)
+      });
+
+      const data = await response.json();
+
+      loader.style.display = 'none';
+      submitBtn.disabled = false;
+      resultSection.style.display = 'block';
+
+      if (response.ok) {
+        statusBadge.textContent = `성공 (HTTP ${response.status})`;
+        statusBadge.className = 'status-badge status-success';
+        jsonOutput.textContent = JSON.stringify(data, null, 2);
+      } else {
+        statusBadge.textContent = `실패 (HTTP ${response.status})`;
+        statusBadge.className = 'status-badge status-error';
+        jsonOutput.textContent = JSON.stringify(data, null, 2);
+      }
+
+    } catch (error) {
+      loader.style.display = 'none';
+      submitBtn.disabled = false;
+      resultSection.style.display = 'block';
+      statusBadge.textContent = '연결 오류';
+      statusBadge.className = 'status-badge status-error';
+      jsonOutput.textContent = JSON.stringify({
+        error: "백엔드 서버와 통신할 수 없습니다.",
+        message: error.message,
+        tip: "1. 터미널에서 'node server.js' 명령어로 서버가 실행 중인지 확인하세요.\n2. 포트 3001번이 사용 중인지 점검하세요."
+      }, null, 2);
+    }
+  });
+</script>
+
+</body>
+</html>
