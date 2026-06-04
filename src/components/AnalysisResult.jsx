@@ -11,6 +11,17 @@ export default function AnalysisResult({
   const [activeSubTab, setActiveSubTab] = useState("info"); // "info", "combat", "prevention"
   const [loadingTextIndex, setLoadingTextIndex] = useState(0);
 
+  const getPestEmoji = (id) => {
+    switch (id) {
+      case "cockroach": return "🪳";
+      case "mosquito": return "🦟";
+      case "bedbug": return "🪲";
+      case "fruitfly": return "🪰";
+      case "drugstore_beetle": return "🐞";
+      default: return "🐛";
+    }
+  };
+
   const loadingMessages = [
     "해충 사진 분석 중...",
     "이미지 픽셀 매칭 중...",
@@ -177,8 +188,21 @@ export default function AnalysisResult({
 
       {/* Result Hero Header Card */}
       <div className={`result-header-card ${risk.className}`} style={{ marginBottom: "20px" }}>
-        <div className="result-image-holder">
-          <img src={image || result.imageUrl} alt={result.name} />
+        <div 
+          className="result-image-holder"
+          style={result.isSampleDemo ? {
+            display: "flex",
+            alignItems: "center",
+            justifyContent: "center",
+            backgroundColor: "rgba(255, 255, 255, 0.2)",
+            fontSize: "56px"
+          } : undefined}
+        >
+          {result.isSampleDemo ? (
+            getPestEmoji(result.id)
+          ) : (
+            <img src={image || result.imageUrl} alt={result.name} />
+          )}
         </div>
         <h2 className="result-name-kr">{result.name}</h2>
         <div className="result-name-sci">{result.scientificName || "Scientific Name Unknown"}</div>
