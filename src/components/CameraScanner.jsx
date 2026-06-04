@@ -141,6 +141,7 @@ export default function CameraScanner({ onImageCaptured }) {
             <video 
               ref={videoRef} 
               className="scanner-video" 
+              autoPlay
               playsInline 
               muted
             />
