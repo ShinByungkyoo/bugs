@@ -1159,3 +1159,8 @@ h1, h2, h3, h4, h5, h6 {
   color: var(--color-danger);
   border: 1px solid rgba(224, 122, 95, 0.1);
 }
+
+/* Dark theme logo contrast filter */
+.dark-theme .header-logo {
+  filter: invert(0.9) hue-rotate(180deg);
+}

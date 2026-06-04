@@ -23,9 +23,10 @@ export default function Layout({
       <header className="app-header">
         <div className="app-logo" onClick={() => setActiveTab("dashboard")} style={{ cursor: "pointer", display: "flex", alignItems: "center" }}>
           <img 
-            src="/cesco_wecheck.png" 
-            alt="CESCO WeCheck Logo" 
-            style={{ height: "32px", width: "auto", borderRadius: "6px" }} 
+            src="/wecheck.png" 
+            alt="WeCheck Logo" 
+            className="header-logo"
+            style={{ height: "30px", width: "auto" }} 
           />
         </div>
         
